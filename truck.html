@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <canvas id="canvas" width="500" height="500"></canvas>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.138.3/build/three.module.js",
+          "GLTFLoader": "https://unpkg.com/three@0.141.0/examples/jsm/loaders/GLTFLoader.js"
+        }
+      }
+    </script>
+
+    <script type="module">
+      import { GLTFLoader } from 'GLTFLoader';
+      import * as THREE from 'three';
+      import { OrbitControls } from 'https://threejs.org/examples/jsm/controls/OrbitControls.js';
+
+      // 1. 장면을 만들기
+      let scene = new THREE.Scene();
+
+      // 2. 브라우저에 렌더링
+      let renderer = new THREE.WebGLRenderer({
+        canvas: document.querySelector('#canvas'),
+        antialias: true,
+      });
+      renderer.outputEncoding = THREE.sRGBEncoding;
+
+      let camera = new THREE.PerspectiveCamera(2, 1);
+      camera.position.set(0, 0, 1);
+      
+      scene.background = new THREE.Color('white');
+      let light = new THREE.DirectionalLight(0xffff00, 10);
+      scene.add(light);
+
+      let controls = new OrbitControls(camera, renderer.domElement);
+      controls.rotateSpeed = 1.0; // 마우스로 카메라를 회전
+      controls.zoomSpeed = 1.2; // 마우스 휠로 카메라를 줌
+      controls.panSpeed = 0.8; 
+      controls.minDistance = 5;
+      controls.maxDistance = 100;
+
+      let loader = new GLTFLoader();
+      // 로딩이 끝나면 콜백함수
+      loader.load('cartoon_truck/scene.gltf', function (gltf) {
+        scene.add(gltf.scene);
+        // 애니메이션 부분
+        function animate() {
+          requestAnimationFrame(animate);
+          gltf.scene.rotation.y += 0.01;
+          renderer.render(scene, camera); // 장면 렌더링
+          controls.update();
+        }
+        animate();
+      });
+    </script>
+  </body>
+</html>
